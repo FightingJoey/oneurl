@@ -42,3 +42,4 @@ gradle :app:assembleDebug     # 产物 app/build/outputs/apk/debug/app-debug.apk
 - 网址存在 `SharedPreferences`（`oneurl` / `start_url`）。
 - `usesCleartextTraffic=true`，所以 `http://` 的局域网地址也能打开（不然 Android 9+ 默认拦明文）。
 - 返回键先网页后退，退无可退才退出应用。
+- 主题 `AppTheme`（`res/values/styles.xml`）把状态栏压成**纯黑 + 浅色图标**，`MainActivity` 里再兜底设一遍，防止个别 ROM 按自己的配色刷回浅色。

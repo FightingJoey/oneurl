@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -35,9 +37,29 @@ public class MainActivity extends Activity {
         return getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
+    /**
+     * 状态栏压成纯黑。主题里已经写了 statusBarColor，
+     * 这里再设一遍是兜底：少数 ROM 会按自己的配色重刷状态栏。
+     */
+    private void applyBlackStatusBar() {
+        Window win = getWindow();
+        // 让状态栏颜色由窗口决定，而不是盖一层半透明遮罩
+        win.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        win.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        win.setStatusBarColor(Color.BLACK);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // 光有黑底不够：浅色主题会带 SYSTEM_UI_FLAG_LIGHT_STATUS_BAR，
+            // 那是"深色图标配浅色背景"的标志，黑底上必须去掉
+            View decor = win.getDecorView();
+            decor.setSystemUiVisibility(
+                    decor.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        applyBlackStatusBar();
 
         web = new WebView(this);
         WebSettings s = web.getSettings();
